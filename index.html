@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#151515">
-<title>GOURMET NOTE v0.3</title>
+<title>GOURMET NOTE v0.4</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#f5f4f1;color:#171717;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
@@ -52,6 +52,23 @@ input,select,button{font:inherit}
 .aiBox b{display:block;margin-bottom:5px}
 .aiBox p{font-size:13px;color:#666;line-height:1.5;margin:0}
 .notice{font-size:12px;color:#777;margin-top:8px;line-height:1.45}
+.analyzeBtn{width:100%;border:0;background:#171717;color:#fff;border-radius:14px;padding:14px;font-weight:700;font-size:15px;margin-top:12px}
+.analyzeBtn:disabled{opacity:.45}
+.aiStatus{display:none;margin-top:12px;background:#f2f2f2;border-radius:15px;padding:14px}
+.aiStatus.show{display:block}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid #bbb;border-top-color:#171717;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-3px;margin-right:7px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.candidate{display:none;margin-top:12px;border:1px solid #ddd;border-radius:16px;padding:14px;background:#fff}
+.candidate.show{display:block}
+.candidate .label{font-size:12px;color:#777;margin-bottom:5px}
+.candidate .shop{font-size:18px;font-weight:800}
+.candidate .candidateMeta{font-size:13px;color:#666;line-height:1.5;margin-top:5px}
+.candidateBtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.candidateBtns button{border:0;border-radius:12px;padding:12px;font-weight:700}
+.candidateBtns .yes{background:#171717;color:#fff}
+.candidateBtns .no{background:#eee;color:#171717}
+.formStage{display:none;margin-top:12px}
+.formStage.show{display:block}
 .sceneBox{margin:9px 0 4px}
 .sceneLabel{font-size:13px;color:#666;margin-bottom:7px}
 .sceneTags{display:flex;flex-wrap:wrap;gap:7px}
@@ -71,7 +88,7 @@ input,select,button{font:inherit}
 
 <div class="hero">
 <b>スクリーンショット登録</b>
-<p>Instagram・Web・SNSで気になったお店を保存。現在のv0.2では画像を添付して登録情報を確認できます。AIによる店名・住所・ジャンルの自動認識は次段階で接続できる設計です。</p>
+<p>Instagram・Web・SNSで気になったお店をスクショから保存。画像解析 → 店舗候補の確認 → ジャンル・利用シーンを選んで登録する流れに対応したv0.4です。</p>
 </div>
 
 <div class="quick">
@@ -107,11 +124,19 @@ input,select,button{font:inherit}
 <input id="shot" type="file" accept="image/*">
 <img id="preview" class="preview">
 </div>
-<div class="aiBox">
-<b>AI自動認識（次段階）</b>
-<p>画像から「店名・住所・ジャンル・店舗候補」を抽出し、「この店です」と確認してから登録する流れをここに接続します。</p>
+<button id="analyzeBtn" class="analyzeBtn" onclick="analyzeScreenshot()" disabled>画像を解析</button>
+<div id="aiStatus" class="aiStatus"></div>
+<div id="candidate" class="candidate">
+  <div class="label">認識した店舗候補</div>
+  <div id="candidateName" class="shop"></div>
+  <div id="candidateMeta" class="candidateMeta"></div>
+  <div class="candidateBtns">
+    <button class="yes" onclick="acceptCandidate()">この店です</button>
+    <button class="no" onclick="rejectCandidate()">違う店を探す</button>
+  </div>
 </div>
-<input id="cn" placeholder="店名（現在は確認・手入力）">
+<div id="captureForm" class="formStage">
+<input id="cn" placeholder="店名">
 <input id="ca" placeholder="地域・エリア">
 <select id="cg"><option value="">ジャンルを選択</option>
 <option>居酒屋</option>
@@ -147,8 +172,9 @@ input,select,button{font:inherit}
 </div>
 <textarea id="cm" placeholder="メモ"></textarea>
 <select id="cp"><option>★①</option><option>★②</option><option>★③</option></select>
-<div class="notice">※ v0.2はスクリーンショット添付まで動作します。ブラウザだけで安全・高精度な店舗特定を行うには外部AI/店舗検索サービスとの接続が必要です。</div>
+<div class="notice">※ v0.4は「画像解析 → 候補確認 → 登録」の画面フローまで実装しています。実際の自動認識は次にAI/店舗検索APIを接続すると有効になります。接続前でも「手入力で続ける」で登録できます。</div>
 <div class="buttons"><button onclick="closeModal('captureModal')">キャンセル</button><button class="primary" onclick="addCaptured()">登録</button></div>
+</div>
 </div>
 </div>
 
@@ -245,16 +271,59 @@ function render(){
    </article>`
  }).join(''):'<div class="empty">該当するお店がありません</div>';
 }
-function openCapture(){captureModal.style.display='block'}
+function openCapture(){captureModal.style.display='block';resetRecognition()}
 function openManual(){manualModal.style.display='block'}
 function closeModal(id){document.getElementById(id).style.display='none'}
 function checkedScenes(name){return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(x=>x.value)}
 function clearScenes(name){document.querySelectorAll(`input[name="${name}"]`).forEach(x=>x.checked=false)}
+
+let recognitionCandidate=null;
+function resetRecognition(){
+ recognitionCandidate=null;
+ analyzeBtn.disabled=!pendingImage;
+ aiStatus.className='aiStatus';
+ aiStatus.innerHTML='';
+ candidate.className='candidate';
+ candidateName.textContent='';
+ candidateMeta.textContent='';
+ captureForm.className='formStage';
+}
+function analyzeScreenshot(){
+ if(!pendingImage){alert('先にスクリーンショットを選択してください');return}
+ aiStatus.className='aiStatus show';
+ aiStatus.innerHTML='<span class="spinner"></span>画像を解析しています…';
+ candidate.className='candidate';
+ captureForm.className='formStage';
+ setTimeout(()=>{
+   aiStatus.innerHTML='<b>AI接続の準備ができています</b><br><span style="font-size:13px;color:#666">現在は外部AI/店舗検索API未接続のため、自動判定はまだ行いません。下の「手入力で続ける」から登録できます。</span><br><button onclick="manualAfterAnalysis()" style="margin-top:10px;border:0;border-radius:10px;padding:10px 12px;font-weight:700">手入力で続ける</button>';
+ },650);
+}
+function manualAfterAnalysis(){
+ aiStatus.className='aiStatus';
+ captureForm.className='formStage show';
+ setTimeout(()=>cn.focus(),100);
+}
+function acceptCandidate(){
+ if(!recognitionCandidate)return;
+ cn.value=recognitionCandidate.name||'';
+ ca.value=recognitionCandidate.area||'';
+ caddr.value=recognitionCandidate.address||'';
+ if(recognitionCandidate.genre) cg.value=recognitionCandidate.genre;
+ candidate.className='candidate';
+ captureForm.className='formStage show';
+}
+function rejectCandidate(){
+ candidate.className='candidate';
+ captureForm.className='formStage show';
+ cn.value=''; ca.value=''; caddr.value=''; cg.value='';
+ setTimeout(()=>cn.focus(),100);
+}
+
 function addCaptured(){
  let name=cn.value.trim(); if(!name){alert('店名を入力してください');return}
  shops.unshift({name,area:ca.value.trim(),genre:cg.value.trim(),address:caddr.value.trim(),memo:cm.value.trim(),priority:cp.value,status:'want',image:pendingImage,scenes:checkedScenes('cscene')});
  ['cn','ca','caddr','cm'].forEach(id=>document.getElementById(id).value='');cg.value='';
- pendingImage='';preview.src='';preview.style.display='none';shot.value='';clearScenes('cscene');
+ pendingImage='';preview.src='';preview.style.display='none';shot.value='';clearScenes('cscene');resetRecognition();
  closeModal('captureModal');save()
 }
 function addManual(){
@@ -268,12 +337,20 @@ function resetFilters(){q.value='';status.value='';genre.value='';area.value='';
 function showFavorites(){q.value='';status.value='';genre.value='';area.value='';scene.value='';render();window.scrollTo({top:document.querySelector('.tools').offsetTop,behavior:'smooth'})}
 function showMapInfo(){
  infoTitle.textContent='地図一覧';
- infoBody.innerHTML='v0.2では各店舗からGoogleマップ検索を開けます。<br><br>次段階で、登録店舗を1枚の地図上にピン表示する「地図一覧」を実装する想定です。';
+ infoBody.innerHTML='各店舗の「Googleマップ」から店舗検索を開けます。登録店舗を1枚の地図上にピン表示する地図一覧は次のアップデートで接続予定です。';
  infoModal.style.display='block'
 }
 shot.addEventListener('change',e=>{
  const f=e.target.files[0];if(!f)return;
- const r=new FileReader();r.onload=ev=>{pendingImage=ev.target.result;preview.src=pendingImage;preview.style.display='block'};r.readAsDataURL(f)
+ const r=new FileReader();
+ r.onload=ev=>{
+   pendingImage=ev.target.result;
+   preview.src=pendingImage;
+   preview.style.display='block';
+   resetRecognition();
+   analyzeBtn.disabled=false;
+ };
+ r.readAsDataURL(f)
 });
 q.oninput=render;status.onchange=render;genre.onchange=render;area.onchange=render;scene.onchange=render;render();
 </script>
