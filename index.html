@@ -288,15 +288,61 @@ function resetRecognition(){
  candidateMeta.textContent='';
  captureForm.className='formStage';
 }
-function analyzeScreenshot(){
- if(!pendingImage){alert('先にスクリーンショットを選択してください');return}
- aiStatus.className='aiStatus show';
- aiStatus.innerHTML='<span class="spinner"></span>画像を解析しています…';
- candidate.className='candidate';
- captureForm.className='formStage';
- setTimeout(()=>{
-   aiStatus.innerHTML='<b>AI接続の準備ができています</b><br><span style="font-size:13px;color:#666">現在は外部AI/店舗検索API未接続のため、自動判定はまだ行いません。下の「手入力で続ける」から登録できます。</span><br><button onclick="manualAfterAnalysis()" style="margin-top:10px;border:0;border-radius:10px;padding:10px 12px;font-weight:700">手入力で続ける</button>';
- },650);
+async function analyzeScreenshot(){
+  if(!pendingImage){
+    alert('先にスクリーンショットを選択してください');
+    return;
+  }
+
+  aiStatus.className='aiStatus show';
+  aiStatus.innerHTML='<span class="spinner"></span>画像をAIで解析しています…';
+  candidate.className='candidate';
+  captureForm.className='formStage';
+
+  try {
+    const response = await fetch(
+      'https://gourmet-note-api.hnet0705.workers.dev/',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          image: pendingImage
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+      throw new Error(data.error || 'AI解析に失敗しました');
+    }
+
+    recognitionCandidate = data;
+
+    aiStatus.className='aiStatus';
+
+    candidateName.textContent =
+      data.restaurant_name || data.name || '店舗名を特定できませんでした';
+
+    candidateMeta.textContent =
+      [data.address, data.category]
+        .filter(Boolean)
+        .join(' / ');
+
+    candidate.className='candidate show';
+
+  } catch(error) {
+    console.error(error);
+
+    aiStatus.className='aiStatus show';
+    aiStatus.innerHTML =
+      '<b>画像の解析に失敗しました</b><br>' +
+      '<span style="font-size:13px;color:#666">' +
+      error.message +
+      '</span>';
+  }
 }
 function manualAfterAnalysis(){
  aiStatus.className='aiStatus';
