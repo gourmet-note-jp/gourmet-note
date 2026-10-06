@@ -363,7 +363,64 @@ cm.value=memoParts.join('\n');
 candidate.className='candidate';
  captureForm.className='formStage show';
 }
-function rejectCandidate(){
+async function rejectCandidate(){
+ if(!recognitionCandidate)return;
+
+ const excludedName =
+   recognitionCandidate.restaurant_name ||
+   recognitionCandidate.name ||
+   '';
+
+ candidate.className='candidate';
+ captureForm.className='formStage';
+
+ aiStatus.className='aiStatus show';
+ aiStatus.innerHTML='<span class="spinner"></span>別の店舗候補を探しています…';
+
+ try{
+   const response = await fetch(
+     'https://gourmet-note-api.hnet0705.workers.dev/',
+     {
+       method:'POST',
+       headers:{'Content-Type':'application/json'},
+       body:JSON.stringify({
+         image:pendingImage,
+         exclude:excludedName ? [excludedName] : []
+       })
+     }
+   );
+
+   const data = await response.json();
+
+   if(!response.ok){
+     throw new Error(data.error || '別候補の検索に失敗しました');
+   }
+
+   recognitionCandidate=data;
+
+   aiStatus.className='aiStatus';
+
+   candidateName.textContent =
+     data.restaurant_name ||
+     data.name ||
+     '別の店舗候補を特定できませんでした';
+
+   candidateMeta.textContent =
+     [data.address,data.category]
+       .filter(Boolean)
+       .join(' / ');
+
+   candidate.className='candidate show';
+
+ }catch(error){
+   aiStatus.className='aiStatus show';
+   aiStatus.innerHTML=
+     '<b>別候補の検索に失敗しました</b><br>'+
+     '<span style="font-size:13px;color:#666">'+
+     error.message+
+     '</span>';
+ }
+}
  candidate.className='candidate';
  captureForm.className='formStage show';
  cn.value=''; ca.value=''; caddr.value=''; cg.value='';
