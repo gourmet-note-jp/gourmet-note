@@ -355,7 +355,12 @@ cn.value=recognitionCandidate.restaurant_name||recognitionCandidate.name||'';
 ca.value=recognitionCandidate.area||((recognitionCandidate.address||'').match(/(?:.+?[都道府県])?(.+?市.+?区|.+?市|.+?区)/)?.[1]||'');
  caddr.value=recognitionCandidate.address||'';
  if(recognitionCandidate.category||recognitionCandidate.genre) cg.value=recognitionCandidate.category||recognitionCandidate.genre;
- candidate.className='candidate';
+ const memoParts=[];
+if(recognitionCandidate.phone) memoParts.push('電話：'+recognitionCandidate.phone);
+if(recognitionCandidate.hours) memoParts.push('営業時間：'+recognitionCandidate.hours);
+if(recognitionCandidate.closed_days) memoParts.push('定休日：'+recognitionCandidate.closed_days);
+cm.value=memoParts.join('\n');
+candidate.className='candidate';
  captureForm.className='formStage show';
 }
 function rejectCandidate(){
