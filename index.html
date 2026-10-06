@@ -80,6 +80,38 @@ input,select,button{font:inherit}
 .sceneView span{font-size:12px;background:#f0eee9;border-radius:999px;padding:5px 8px}
 .empty{text-align:center;color:#888;padding:35px}
 .sectionTitle{font-size:14px;color:#777;margin:18px 3px 5px}
+.viewSize{
+  display:flex;
+  gap:8px;
+  margin:14px 0;
+}
+
+.viewSize button{
+  flex:1;
+  padding:10px;
+  border:1px solid #ddd;
+  border-radius:12px;
+  background:#fff;
+  font-size:14px;
+}
+
+body.size-small .card{
+  padding:10px;
+  font-size:13px;
+}
+
+body.size-small .card .name{
+  font-size:15px;
+}
+
+body.size-large .card{
+  padding:22px;
+  font-size:17px;
+}
+
+body.size-large .card .name{
+  font-size:22px;
+}
 </style>
 </head>
 <body>
@@ -95,7 +127,15 @@ input,select,button{font:inherit}
 <button onclick="openCapture()"><span style="font-size:25px">📷</span><strong>スクショから登録</strong><small>画像を選んで店舗情報へ</small></button>
 <button onclick="openManual()"><span style="font-size:25px">＋</span><strong>手入力で登録</strong><small>店名・地域・ジャンル</small></button>
 </div>
+<div class="viewSize">
 
+  <button onclick="setViewSize('small')">小</button>
+
+  <button onclick="setViewSize('normal')">標準</button>
+
+  <button onclick="setViewSize('large')">大</button>
+
+</div>
 <div class="tools">
 <input class="search" id="q" placeholder="店名・地域・ジャンルを検索">
 <div class="filters">
@@ -480,6 +520,23 @@ shot.addEventListener('change',e=>{
  r.readAsDataURL(f)
 });
 q.oninput=render;status.onchange=render;genre.onchange=render;area.onchange=render;scene.onchange=render;render();
+function setViewSize(size){
+  document.body.classList.remove('size-small','size-large');
+
+  if(size==='small'){
+    document.body.classList.add('size-small');
+  }
+
+  if(size==='large'){
+    document.body.classList.add('size-large');
+  }
+
+  localStorage.setItem('gourmetViewSize',size);
+}
+
+const savedViewSize=localStorage.getItem('gourmetViewSize')||'normal';
+setViewSize(savedViewSize);
+
 </script>
 </body>
 </html>
