@@ -421,11 +421,6 @@ async function rejectCandidate(){
      '</span>';
  }
 }
- candidate.className='candidate';
- captureForm.className='formStage show';
- cn.value=''; ca.value=''; caddr.value=''; cg.value='';
- setTimeout(()=>cn.focus(),100);
-}
 
 function addCaptured(){
  let name=cn.value.trim(); if(!name){alert('店名を入力してください');return}
