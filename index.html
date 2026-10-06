@@ -350,11 +350,11 @@ function manualAfterAnalysis(){
  setTimeout(()=>cn.focus(),100);
 }
 function acceptCandidate(){
- if(!recognitionCandidate)return;
- cn.value=recognitionCandidate.name||'';
+if(!recognitionCandidate)return;
+cn.value=recognitionCandidate.restaurant_name||recognitionCandidate.name||'';
  ca.value=recognitionCandidate.area||'';
  caddr.value=recognitionCandidate.address||'';
- if(recognitionCandidate.genre) cg.value=recognitionCandidate.genre;
+ if(recognitionCandidate.category||recognitionCandidate.genre) cg.value=recognitionCandidate.category||recognitionCandidate.genre;
  candidate.className='candidate';
  captureForm.className='formStage show';
 }
