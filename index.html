@@ -307,7 +307,11 @@ function render(){
    <div class="priority">${esc(x.priority)}</div>
    ${x.memo?`<div class="meta">📝 ${esc(x.memo)}</div>`:''}
    ${x.image?`<img src="${x.image}" style="width:100%;max-height:180px;object-fit:cover;border-radius:12px;margin-top:10px">`:''}
-   <div class="actions"><a href="${map}" target="_blank">Googleマップ</a><button class="done" onclick="toggle(${i})">${x.status==='done'?'行きたいへ':'訪問済み'}</button></div>
+ <div class="actions">
+  <a href="${map}" target="_blank">Googleマップ</a>
+  <button class="done" onclick="toggle(${i})">${x.status==='done'?'行きたいへ':'訪問済み'}</button>
+  <button onclick="deleteShop(${i})">削除</button>
+</div>
    </article>`
  }).join(''):'<div class="empty">該当するお店がありません</div>';
 }
