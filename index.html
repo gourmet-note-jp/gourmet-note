@@ -504,6 +504,11 @@ function addManual(){
  clearScenes('mscene');closeModal('manualModal');save()
 }
 function toggle(i){shops[i].status=shops[i].status==='done'?'want':'done';save()}
+function deleteShop(i){
+  if(!confirm('この店舗を削除しますか？'))return;
+  shops.splice(i,1);
+  save();
+}
 function resetFilters(){q.value='';status.value='';genre.value='';area.value='';scene.value='';render()}
 function showFavorites(){q.value='';status.value='';genre.value='';area.value='';scene.value='';render();window.scrollTo({top:document.querySelector('.tools').offsetTop,behavior:'smooth'})}
 function showMapInfo(){
