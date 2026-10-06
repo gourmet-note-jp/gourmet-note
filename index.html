@@ -352,7 +352,7 @@ function manualAfterAnalysis(){
 function acceptCandidate(){
 if(!recognitionCandidate)return;
 cn.value=recognitionCandidate.restaurant_name||recognitionCandidate.name||'';
- ca.value=recognitionCandidate.area||'';
+ca.value=recognitionCandidate.area||((recognitionCandidate.address||'').match(/(?:.+?[都道府県])?(.+?市.+?区|.+?市|.+?区)/)?.[1]||'');
  caddr.value=recognitionCandidate.address||'';
  if(recognitionCandidate.category||recognitionCandidate.genre) cg.value=recognitionCandidate.category||recognitionCandidate.genre;
  candidate.className='candidate';
