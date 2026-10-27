@@ -30,7 +30,18 @@ input,select,button{font:inherit}
 .tag{font-size:12px;background:#eee;border-radius:999px;padding:5px 9px;white-space:nowrap}
 .meta{color:#6b6b6b;font-size:14px;margin-top:7px}
 .priority{font-weight:750;margin-top:9px}
-.actions{display:flex;gap:8px;margin-top:13px}
+.card .meta + .meta{
+  padding-top:6px;
+  border-top:1px solid #f0f0f0;
+}
+
+.card .priority{
+  display:inline-block;
+  background:#f7f3e8;
+  border-radius:999px;
+  padding:5px 9px;
+}
+  .actions{display:flex;gap:8px;margin-top:13px}
 .actions button,.actions a{border:0;text-decoration:none;text-align:center;background:#eee;color:#111;border-radius:11px;padding:10px;flex:1}
 .actions .done{background:#171717;color:#fff}
   .actions .delete{
