@@ -371,6 +371,7 @@ ${closed ? `<div class="meta closed">📅 ${esc(closed.replace('定休日：',''
  <div class="actions">
   <a href="${map}" target="_blank">Googleマップ</a>
   <button class="done" onclick="toggle(${i})">${x.status==='done'?'行きたいへ':'訪問済み'}</button>
+  <button onclick="editShop(${i})">編集</button>
   <button class="delete" onclick="deleteShop(${i})">削除</button>
 </div>
    </article>`
@@ -559,12 +560,67 @@ function addCaptured(){
  closeModal('captureModal');save()
 }
 function addManual(){
+  let name=mn.value.trim();
+  if(!name){
+    alert('店名を入力してください');
+    return;
+  }
+
+  const data={
+    name,
+    area:ma.value.trim(),
+    genre:mg.value.trim(),
+    address:maddr.value.trim(),
+    memo:mm.value.trim(),
+    priority:mp.value,
+    scenes:checkedScenes('mscene')
+  };
+
+  if(editingIndex!==null){
+    data.status=shops[editingIndex].status;
+    data.image=shops[editingIndex].image||'';
+    shops[editingIndex]=data;
+    editingIndex=null;
+  }else{
+    data.status='want';
+    shops.unshift(data);
+  }
+
+  ['mn','ma','maddr','mm'].forEach(id=>document.getElementById(id).value='');
+  mg.value='';
+  clearScenes('mscene');
+  closeModal('manualModal');
+  save();
+}
  let name=mn.value.trim();if(!name){alert('店名を入力してください');return}
  shops.unshift({name,area:ma.value.trim(),genre:mg.value.trim(),address:maddr.value.trim(),memo:mm.value.trim(),priority:mp.value,status:'want',scenes:checkedScenes('mscene')});
  ['mn','ma','maddr','mm'].forEach(id=>document.getElementById(id).value='');mg.value='';
  clearScenes('mscene');closeModal('manualModal');save()
 }
-function toggle(i){shops[i].status=shops[i].status==='done'?'want':'done';save()}
+let editingIndex=null;
+
+function editShop(i){
+  editingIndex=i;
+
+  const shop=shops[i];
+
+  mn.value=shop.name||'';
+  ma.value=shop.area||'';
+  mg.value=shop.genre||'';
+  maddr.value=shop.address||'';
+  mm.value=shop.memo||'';
+  mp.value=shop.priority||'★①';
+
+  clearScenes('mscene');
+
+  (shop.scenes||[]).forEach(scene=>{
+    const el=document.querySelector(`input[name="mscene"][value="${scene}"]`);
+    if(el) el.checked=true;
+  });
+
+  manualModal.style.display='block';
+}
+  function toggle(i){shops[i].status=shops[i].status==='done'?'want':'done';save()}
 function deleteShop(i){
   if(!confirm('この店舗を削除しますか？'))return;
   shops.splice(i,1);
