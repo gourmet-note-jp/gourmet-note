@@ -686,26 +686,46 @@ function showMapInfo(filter='all'){
     filter==='all' || shop.status===filter
   );
 
-  infoBody.innerHTML=`
-    <div style="display:flex;gap:8px;margin-bottom:12px">
-      <button onclick="showMapInfo('all')">すべて</button>
-      <button onclick="showMapInfo('want')">行きたい</button>
-      <button onclick="showMapInfo('done')">訪問済み</button>
-    </div>
-  ` + mapShops.map(shop=>{
+  const grouped={};
+
+mapShops.forEach(shop=>{
+  const area=shop.area||'地域未設定';
+  if(!grouped[area]) grouped[area]=[];
+  grouped[area].push(shop);
+});
+
+infoBody.innerHTML=`
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <button onclick="showMapInfo('all')">すべて</button>
+    <button onclick="showMapInfo('want')">行きたい</button>
+    <button onclick="showMapInfo('done')">訪問済み</button>
+  </div>
+` + Object.keys(grouped).sort((a,b)=>a.localeCompare(b,'ja')).map(area=>{
+
+  const shopsHtml=grouped[area].map(shop=>{
     const map='https://www.google.com/maps/search/?api=1&query='+
       encodeURIComponent([shop.name,shop.address,shop.area].filter(Boolean).join(' '));
 
     return `
-      <div style="padding:12px 0;border-bottom:1px solid #eee">
+      <div style="padding:10px 0;border-bottom:1px solid #eee">
         <div style="font-weight:700">${esc(shop.name)}</div>
         <div style="font-size:13px;color:#777;margin:4px 0">
-          ${esc([shop.area,shop.genre].filter(Boolean).join(' ・ '))}
+          ${esc(shop.genre||'')}
         </div>
         <a href="${map}" target="_blank">Googleマップで開く</a>
       </div>
     `;
   }).join('');
+
+  return `
+    <div style="margin-top:18px">
+      <div style="font-weight:800;font-size:16px;margin-bottom:6px">
+        ${esc(area)}
+      </div>
+      ${shopsHtml}
+    </div>
+  `;
+}).join('');
 
   infoModal.style.display='block';
 }
