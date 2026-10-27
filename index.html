@@ -355,7 +355,7 @@ if(so==='priority'){
   );
 
   return `
-    ${phone ? `<div class="meta">📞 ${esc(phone.replace('電話：',''))}</div>` : ''}
+ ${phone ? `<div class="meta">📞 <a href="tel:${phone.replace('電話：','').replace(/[^0-9+]/g,'')}">${esc(phone.replace('電話：',''))}</a></div>` : ''}
     ${hours ? `<div class="meta">🕒 ${esc(hours.replace('営業時間：',''))}</div>` : ''}
     ${closed ? `<div class="meta">📅 ${esc(closed.replace('定休日：',''))}</div>` : ''}
     ${other.length ? `<div class="meta">📝 ${esc(other.join(' / '))}</div>` : ''}
