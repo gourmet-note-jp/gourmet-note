@@ -735,7 +735,10 @@ infoBody.innerHTML=`
 
     return `
       <div style="padding:10px 0;border-bottom:1px solid #eee">
-        <div style="font-weight:700">${esc(shop.name)}</div>
+        <div style="display:flex;justify-content:space-between;gap:8px;align-items:center">
+  <div style="font-weight:700">${esc(shop.name)}</div>
+  <span class="tag">${shop.status==='done'?'訪問済み':'行きたい'}</span>
+</div>
         <div style="font-size:13px;color:#777;margin:4px 0">
           ${esc(shop.genre||'')}
         </div>
