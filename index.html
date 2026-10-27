@@ -553,7 +553,12 @@ status.onchange=render;
 genre.onchange=render;
 area.onchange=render;
 scene.onchange=render;
-sort.onchange=render;
+sort.onchange=()=>{
+  localStorage.setItem('gourmetSort',sort.value);
+  render();
+};
+
+sort.value=localStorage.getItem('gourmetSort')||'new';
 render();
 function setViewSize(size){
   document.body.classList.remove('size-small','size-large');
