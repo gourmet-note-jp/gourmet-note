@@ -29,6 +29,12 @@ input,select,button{font:inherit}
 .name{font-size:18px;font-weight:750}
 .tag{font-size:12px;background:#eee;border-radius:999px;padding:5px 9px;white-space:nowrap}
 .meta{color:#6b6b6b;font-size:14px;margin-top:7px}
+  .meta.hours,
+.meta.closed{
+  background:#f7f7f7;
+  border-radius:10px;
+  padding:8px 10px;
+}
 .priority{font-weight:750;margin-top:9px}
 .card .meta + .meta{
   padding-top:6px;
@@ -356,8 +362,8 @@ if(so==='priority'){
 
   return `
  ${phone ? `<div class="meta">📞 <a href="tel:${phone.replace('電話：','').replace(/[^0-9+]/g,'')}">${esc(phone.replace('電話：',''))}</a></div>` : ''}
-    ${hours ? `<div class="meta">🕒 ${esc(hours.replace('営業時間：',''))}</div>` : ''}
-    ${closed ? `<div class="meta">📅 ${esc(closed.replace('定休日：',''))}</div>` : ''}
+ ${hours ? `<div class="meta hours">🕒 ${esc(hours.replace('営業時間：',''))}</div>` : ''}
+${closed ? `<div class="meta closed">📅 ${esc(closed.replace('定休日：',''))}</div>` : ''}
     ${other.length ? `<div class="meta">📝 ${esc(other.join(' / '))}</div>` : ''}
   `;
 })() : ''}
