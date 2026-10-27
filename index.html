@@ -248,7 +248,7 @@ body.size-large .card .name{
 
 <div class="modal" id="manualModal">
 <div class="panel">
-<h2>お店を手入力</h2>
+<h2 id="manualTitle">お店を手入力</h2>
 <input id="mn" placeholder="店名">
 <input id="ma" placeholder="地域・エリア">
 <select id="mg"><option value="">ジャンルを選択</option>
@@ -380,7 +380,7 @@ ${closed ? `<div class="meta closed">📅 ${esc(closed.replace('定休日：',''
 function openCapture(){captureModal.style.display='block';resetRecognition()}
 function openManual(){
   editingIndex=null;
-  manualSaveBtn.textContent='登録';
+  manualTitle.textContent='お店を手入力';manualSaveBtn.textContent='登録';
   manualModal.style.display='block';
 }
 function closeModal(id){document.getElementById(id).style.display='none'}
@@ -622,7 +622,7 @@ function editShop(i){
     if(el) el.checked=true;
   });
 
-  manualSaveBtn.textContent='更新';manualModal.style.display='block';
+  manualTitle.textContent='お店を編集';manualSaveBtn.textContent='更新';manualModal.style.display='block';
 }
   function toggle(i){shops[i].status=shops[i].status==='done'?'want':'done';save()}
 function deleteShop(i){
