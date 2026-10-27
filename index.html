@@ -674,9 +674,30 @@ function showFavorites(){
   });
 }
 function showMapInfo(){
- infoTitle.textContent='地図一覧';
- infoBody.innerHTML='各店舗の「Googleマップ」から店舗検索を開けます。登録店舗を1枚の地図上にピン表示する地図一覧は次のアップデートで接続予定です。';
- infoModal.style.display='block'
+  infoTitle.textContent='地図一覧';
+
+  if(!shops.length){
+    infoBody.innerHTML='登録されているお店がありません。';
+    infoModal.style.display='block';
+    return;
+  }
+
+  infoBody.innerHTML=shops.map(shop=>{
+    const map='https://www.google.com/maps/search/?api=1&query='+
+      encodeURIComponent([shop.name,shop.address,shop.area].filter(Boolean).join(' '));
+
+    return `
+      <div style="padding:12px 0;border-bottom:1px solid #eee">
+        <div style="font-weight:700">${esc(shop.name)}</div>
+        <div style="font-size:13px;color:#777;margin:4px 0">
+          ${esc([shop.area,shop.genre].filter(Boolean).join(' ・ '))}
+        </div>
+        <a href="${map}" target="_blank">Googleマップで開く</a>
+      </div>
+    `;
+  }).join('');
+
+  infoModal.style.display='block';
 }
 shot.addEventListener('change',e=>{
  const f=e.target.files[0];if(!f)return;
