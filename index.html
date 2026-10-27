@@ -142,7 +142,13 @@ body.size-large .card .name{
 <select id="status"><option value="">すべて</option><option value="want">行きたい</option><option value="done">訪問済み</option></select>
 <select id="genre"><option value="">全ジャンル</option></select>
 <select id="area"><option value="">全地域</option></select><select id="scene"><option value="">全利用シーン</option><option>デート</option><option>大衆</option><option>ひとり飲み</option><option>接待</option><option>友人</option><option>家族</option></select>
-</div>
+<select id="sort">
+  <option value="new">新しい順</option>
+  <option value="old">古い順</option>
+  <option value="name">店名順</option>
+  <option value="area">地域順</option>
+  <option value="priority">★優先順</option>
+</select></div>
 </div>
 
 <div class="sectionTitle" id="countText"></div>
@@ -288,14 +294,28 @@ let pendingImage='';
 function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function save(){localStorage.setItem('gourmetnote02',JSON.stringify(shops));render()}
 function render(){
- const query=q.value.toLowerCase(),st=status.value,ge=genre.value,ar=area.value,sc=scene.value;
+const query=q.value.toLowerCase(),st=status.value,ge=genre.value,ar=area.value,sc=scene.value,so=sort.value;
  const genres=[...new Set(shops.map(x=>x.genre).filter(Boolean))].sort();
  const areas=[...new Set(shops.map(x=>x.area).filter(Boolean))].sort();
  let gv=genre.value,av=area.value;
  genre.innerHTML='<option value="">全ジャンル</option>'+genres.map(x=>`<option>${esc(x)}</option>`).join('');
  area.innerHTML='<option value="">全地域</option>'+areas.map(x=>`<option>${esc(x)}</option>`).join('');
  genre.value=gv;area.value=av;
- const arr=shops.filter(x=>(!st||x.status===st)&&(!ge||x.genre===ge)&&(!ar||x.area===ar)&&(!sc||(x.scenes||[]).includes(sc))&&([x.name,x.area,x.genre,x.memo,x.address,(x.scenes||[]).join(' ')].join(' ').toLowerCase().includes(query)));
+let arr=shops.filter(x=>(!st||x.status===st)&&(!ge||x.genre===ge)&&(!ar||x.area===ar)&&(!sc||(x.scenes||[]).includes(sc))&&([x.name,x.area,x.genre,x.memo,x.address,(x.scenes||[]).join(' ')].join(' ').toLowerCase().includes(query)));
+if(so==='old') arr.reverse();
+
+if(so==='name'){
+  arr.sort((a,b)=>(a.name||'').localeCompare(b.name||'','ja'));
+}
+
+if(so==='area'){
+  arr.sort((a,b)=>(a.area||'').localeCompare(b.area||'','ja'));
+}
+
+if(so==='priority'){
+  const order={'★①':1,'★②':2,'★③':3};
+  arr.sort((a,b)=>(order[a.priority]||99)-(order[b.priority]||99));
+} 
  countText.textContent=`${arr.length}件表示 ／ 登録 ${shops.length}件`;
  list.innerHTML=arr.length?arr.map(x=>{
    let i=shops.indexOf(x);
@@ -528,7 +548,13 @@ shot.addEventListener('change',e=>{
  };
  r.readAsDataURL(f)
 });
-q.oninput=render;status.onchange=render;genre.onchange=render;area.onchange=render;scene.onchange=render;render();
+q.oninput=render;
+status.onchange=render;
+genre.onchange=render;
+area.onchange=render;
+scene.onchange=render;
+sort.onchange=render;
+render();
 function setViewSize(size){
   document.body.classList.remove('size-small','size-large');
 
