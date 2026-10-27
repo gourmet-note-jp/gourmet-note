@@ -313,6 +313,7 @@ const seed=[
 ];
 let shops=JSON.parse(localStorage.getItem('gourmetnote02')||'null')||seed;
 let pendingImage='';
+  let favoriteOnly=false;
 function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function save(){localStorage.setItem('gourmetnote02',JSON.stringify(shops));render()}
 function render(){
@@ -323,7 +324,14 @@ const query=q.value.toLowerCase(),st=status.value,ge=genre.value,ar=area.value,s
  genre.innerHTML='<option value="">全ジャンル</option>'+genres.map(x=>`<option>${esc(x)}</option>`).join('');
  area.innerHTML='<option value="">全地域</option>'+areas.map(x=>`<option>${esc(x)}</option>`).join('');
  genre.value=gv;area.value=av;
-let arr=shops.filter(x=>(!st||x.status===st)&&(!ge||x.genre===ge)&&(!ar||x.area===ar)&&(!sc||(x.scenes||[]).includes(sc))&&([x.name,x.area,x.genre,x.memo,x.address,(x.scenes||[]).join(' ')].join(' ').toLowerCase().includes(query)));
+let arr=shops.filter(x=>
+  (!st||x.status===st) &&
+  (!ge||x.genre===ge) &&
+  (!ar||x.area===ar) &&
+  (!sc||(x.scenes||[]).includes(sc)) &&
+  (!favoriteOnly||x.priority==='★①') &&
+  ([x.name,x.area,x.genre,x.memo,x.address,(x.scenes||[]).join(' ')].join(' ').toLowerCase().includes(query))
+);
 if(so==='old') arr.reverse();
 
 if(so==='name'){
@@ -643,8 +651,28 @@ function deleteShop(i){
   shops.splice(i,1);
   save();
 }
-function resetFilters(){q.value='';status.value='';genre.value='';area.value='';scene.value='';render()}
-function showFavorites(){q.value='';status.value='';genre.value='';area.value='';scene.value='';render();window.scrollTo({top:document.querySelector('.tools').offsetTop,behavior:'smooth'})}
+function resetFilters(){
+  q.value='';
+  status.value='';
+  genre.value='';
+  area.value='';
+  scene.value='';
+  favoriteOnly=false;
+  render();
+}
+function showFavorites(){
+  q.value='';
+  status.value='';
+  genre.value='';
+  area.value='';
+  scene.value='';
+  favoriteOnly=true;
+  render();
+  window.scrollTo({
+    top:document.querySelector('.tools').offsetTop,
+    behavior:'smooth'
+  });
+}
 function showMapInfo(){
  infoTitle.textContent='地図一覧';
  infoBody.innerHTML='各店舗の「Googleマップ」から店舗検索を開けます。登録店舗を1枚の地図上にピン表示する地図一覧は次のアップデートで接続予定です。';
