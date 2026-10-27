@@ -33,6 +33,11 @@ input,select,button{font:inherit}
 .actions{display:flex;gap:8px;margin-top:13px}
 .actions button,.actions a{border:0;text-decoration:none;text-align:center;background:#eee;color:#111;border-radius:11px;padding:10px;flex:1}
 .actions .done{background:#171717;color:#fff}
+  .actions .delete{
+  background:#fff0f0;
+  color:#c62828;
+  border:1px solid #f3b5b5;
+}
 .visited{opacity:.67}
 .bottom{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(760px,100%);background:#fff;border-top:1px solid #e7e7e7;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:7px 8px calc(7px + env(safe-area-inset-bottom));z-index:8}
 .bottom button{border:0;background:transparent;padding:7px 2px;font-size:11px}
@@ -330,7 +335,7 @@ if(so==='priority'){
  <div class="actions">
   <a href="${map}" target="_blank">Googleマップ</a>
   <button class="done" onclick="toggle(${i})">${x.status==='done'?'行きたいへ':'訪問済み'}</button>
-  <button onclick="deleteShop(${i})">削除</button>
+  <button class="delete" onclick="deleteShop(${i})">削除</button>
 </div>
    </article>`
  }).join(''):'<div class="empty">該当するお店がありません</div>';
