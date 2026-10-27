@@ -558,6 +558,12 @@ async function rejectCandidate(){
 
 function addCaptured(){
  let name=cn.value.trim(); if(!name){alert('店名を入力してください');return}
+  const duplicate=shops.some(x=>x.name.trim().toLowerCase()===name.toLowerCase());
+
+if(duplicate){
+  const ok=confirm('このお店はすでに登録されています。追加しますか？');
+  if(!ok)return;
+}
  shops.unshift({name,area:ca.value.trim(),genre:cg.value.trim(),address:caddr.value.trim(),memo:cm.value.trim(),priority:cp.value,status:'want',image:pendingImage,scenes:checkedScenes('cscene')});
  ['cn','ca','caddr','cm'].forEach(id=>document.getElementById(id).value='');cg.value='';
  pendingImage='';preview.src='';preview.style.display='none';shot.value='';clearScenes('cscene');resetRecognition();
@@ -569,7 +575,14 @@ function addManual(){
     alert('店名を入力してください');
     return;
   }
+if(editingIndex===null){
+  const duplicate=shops.some(x=>x.name.trim().toLowerCase()===name.toLowerCase());
 
+  if(duplicate){
+    const ok=confirm('このお店はすでに登録されています。追加しますか？');
+    if(!ok)return;
+  }
+}
   const data={
     name,
     area:ma.value.trim(),
