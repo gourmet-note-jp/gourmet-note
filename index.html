@@ -285,7 +285,7 @@ body.size-large .card .name{
 </div>
 <textarea id="mm" placeholder="メモ"></textarea>
 <select id="mp"><option>★①</option><option>★②</option><option>★③</option></select>
-<div class="buttons"><button onclick="closeModal('manualModal')">キャンセル</button><button class="primary" onclick="addManual()">登録</button></div>
+<div class="buttons"><button onclick="closeModal('manualModal')">キャンセル</button><button id="manualSaveBtn" class="primary" onclick="addManual()">登録</button></div>
 </div>
 </div>
 
@@ -378,7 +378,11 @@ ${closed ? `<div class="meta closed">📅 ${esc(closed.replace('定休日：',''
  }).join(''):'<div class="empty">該当するお店がありません</div>';
 }
 function openCapture(){captureModal.style.display='block';resetRecognition()}
-function openManual(){manualModal.style.display='block'}
+function openManual(){
+  editingIndex=null;
+  manualSaveBtn.textContent='登録';
+  manualModal.style.display='block';
+}
 function closeModal(id){document.getElementById(id).style.display='none'}
 function checkedScenes(name){return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(x=>x.value)}
 function clearScenes(name){document.querySelectorAll(`input[name="${name}"]`).forEach(x=>x.checked=false)}
@@ -618,7 +622,7 @@ function editShop(i){
     if(el) el.checked=true;
   });
 
-  manualModal.style.display='block';
+  manualSaveBtn.textContent='更新';manualModal.style.display='block';
 }
   function toggle(i){shops[i].status=shops[i].status==='done'?'want':'done';save()}
 function deleteShop(i){
