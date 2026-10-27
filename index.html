@@ -134,6 +134,25 @@ body.size-large .card{
 body.size-large .card .name{
   font-size:22px;
 }
+  .mapFilters{
+  display:flex;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.mapFilters button{
+  flex:1;
+  border:0;
+  border-radius:10px;
+  padding:9px 8px;
+  background:#eee;
+  color:#111;
+}
+
+.mapFilters button.active{
+  background:#171717;
+  color:#fff;
+}
 </style>
 </head>
 <body>
@@ -695,11 +714,11 @@ mapShops.forEach(shop=>{
 });
 
 infoBody.innerHTML=`
-  <div style="display:flex;gap:8px;margin-bottom:12px">
-    <button onclick="showMapInfo('all')">すべて</button>
-    <button onclick="showMapInfo('want')">行きたい</button>
-    <button onclick="showMapInfo('done')">訪問済み</button>
-  </div>
+  <div class="mapFilters">
+  <button class="${filter==='all'?'active':''}" onclick="showMapInfo('all')">すべて</button>
+  <button class="${filter==='want'?'active':''}" onclick="showMapInfo('want')">行きたい</button>
+  <button class="${filter==='done'?'active':''}" onclick="showMapInfo('done')">訪問済み</button>
+</div>
 ` + Object.keys(grouped).sort((a,b)=>a.localeCompare(b,'ja')).map(area=>{
 
   const shopsHtml=grouped[area].map(shop=>{
