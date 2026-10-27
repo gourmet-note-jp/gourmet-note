@@ -153,6 +153,14 @@ body.size-large .card .name{
   background:#171717;
   color:#fff;
 }
+  .mapAreaTitle{
+  font-weight:800;
+  font-size:16px;
+  margin-bottom:8px;
+  padding:8px 10px;
+  background:#f1f1f1;
+  border-radius:10px;
+}
 </style>
 </head>
 <body>
@@ -738,9 +746,9 @@ infoBody.innerHTML=`
 
   return `
     <div style="margin-top:18px">
-      <div style="font-weight:800;font-size:16px;margin-bottom:6px">
-        ${esc(area)}
-      </div>
+      <div class="mapAreaTitle">
+  ${esc(area)}
+</div>
       ${shopsHtml}
     </div>
   `;
