@@ -414,7 +414,7 @@ ${closed ? `<div class="meta closed">📅 ${esc(closed.replace('定休日：',''
 })() : ''}
    ${x.image?`<img src="${x.image}" style="width:100%;max-height:180px;object-fit:cover;border-radius:12px;margin-top:10px">`:''}
  <div class="actions">
-  <a href="${map}" target="_blank">Googleマップ</a>
+ <a class="mapLink" href="${map}" target="_blank">Googleマップ</a>
   <button class="done" onclick="toggle(${i})">${x.status==='done'?'行きたいへ':'訪問済み'}</button>
   <button onclick="editShop(${i})">編集</button>
   <button class="delete" onclick="deleteShop(${i})">削除</button>
