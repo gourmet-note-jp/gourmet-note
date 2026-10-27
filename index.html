@@ -341,7 +341,26 @@ if(so==='priority'){
    <div class="meta">${esc([x.area,x.genre].filter(Boolean).join(' ・ ')||'情報未設定')}</div>
    ${x.address?`<div class="meta">📍 ${esc(x.address)}</div>`:''}${(x.scenes||[]).length?`<div class="sceneView">${x.scenes.map(s=>`<span>${esc(s)}</span>`).join('')}</div>`:''}
    <div class="priority">${esc(x.priority)}</div>
-   ${x.memo?`<div class="meta">📝 ${esc(x.memo)}</div>`:''}
+   ${x.memo ? (() => {
+  const lines = x.memo.split('\n');
+
+  const phone = lines.find(v => v.startsWith('電話：'));
+  const hours = lines.find(v => v.startsWith('営業時間：'));
+  const closed = lines.find(v => v.startsWith('定休日：'));
+
+  const other = lines.filter(v =>
+    !v.startsWith('電話：') &&
+    !v.startsWith('営業時間：') &&
+    !v.startsWith('定休日：')
+  );
+
+  return `
+    ${phone ? `<div class="meta">📞 ${esc(phone.replace('電話：',''))}</div>` : ''}
+    ${hours ? `<div class="meta">🕒 ${esc(hours.replace('営業時間：',''))}</div>` : ''}
+    ${closed ? `<div class="meta">📅 ${esc(closed.replace('定休日：',''))}</div>` : ''}
+    ${other.length ? `<div class="meta">📝 ${esc(other.join(' / '))}</div>` : ''}
+  `;
+})() : ''}
    ${x.image?`<img src="${x.image}" style="width:100%;max-height:180px;object-fit:cover;border-radius:12px;margin-top:10px">`:''}
  <div class="actions">
   <a href="${map}" target="_blank">Googleマップ</a>
