@@ -673,7 +673,17 @@ function showFavorites(){
     behavior:'smooth'
   });
 }
-function showMapInfo(){
+const mapShops=shops.filter(shop=>
+  filter==='all' || shop.status===filter
+);
+
+infoBody.innerHTML=`
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <button onclick="showMapInfo('all')">すべて</button>
+    <button onclick="showMapInfo('want')">行きたい</button>
+    <button onclick="showMapInfo('done')">訪問済み</button>
+  </div>
+` + mapShops.map(shop=>{
   infoTitle.textContent='地図一覧';
 
   if(!shops.length){
@@ -682,7 +692,17 @@ function showMapInfo(){
     return;
   }
 
-  infoBody.innerHTML=shops.map(shop=>{
+  const mapShops=shops.filter(shop=>
+  filter==='all' || shop.status===filter
+);
+
+infoBody.innerHTML=`
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <button onclick="showMapInfo('all')">すべて</button>
+    <button onclick="showMapInfo('want')">行きたい</button>
+    <button onclick="showMapInfo('done')">訪問済み</button>
+  </div>
+` + mapShops.map(shop=>{
     const map='https://www.google.com/maps/search/?api=1&query='+
       encodeURIComponent([shop.name,shop.address,shop.area].filter(Boolean).join(' '));
 
